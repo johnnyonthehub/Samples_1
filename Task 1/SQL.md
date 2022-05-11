@@ -28,8 +28,8 @@ payment
 
 rental
 
-sqlite_sequence
-
 staff
 
 store
+
+[I've omitted the sqlite_sequence table as this would not normally count toward the number of tables]
