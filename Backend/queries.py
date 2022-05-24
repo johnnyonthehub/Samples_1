@@ -421,18 +421,52 @@ result_joinC = table_joinC()
 
 
 
-#Function 18. SELECT all
+#Function 18. SELECT all from payment table.
+def select_all_payments():
+   with sqlite3.connect ("sakila.db") as conn:
+    cursor = conn.cursor()
+    selectp = f"SELECT * FROM payment"
+    print (selectp)
+    cursor.execute (selectp)
+
+    data = cursor.fetchall()
+    return(data)
+
+result_selectp = select_all_payments()
 
 
 
+#Function 19  SELECT all film categories
+
+def select_all_cats():
+   with sqlite3.connect ("sakila.db") as conn:
+    cursor = conn.cursor()
+    selectc = f"SELECT name FROM category"
+    
+    cursor.execute (selectc)
+   
+    data = cursor.fetchall()
+    print (selectc)
+    return(data)
+
+result_selectc = select_all_cats()
 
 
-#Function 19  SELECT all
 
+#FUNCTION 20. SELECT all languages
 
-#FUNCTION 20. SELECT all
+def select_all_lang():
+   with sqlite3.connect ("sakila.db") as conn:
+    cursor = conn.cursor()
+    selectl = f"SELECT name FROM language"
+    
+    cursor.execute (selectl)
+   
+    data = cursor.fetchall()
+    print (selectl)
+    return(data)
 
-
+result_selectl = select_all_lang()
 
 
 
