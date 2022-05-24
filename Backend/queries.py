@@ -398,11 +398,11 @@ def table_joinB():
    
     
 
-result_joinC = table_joinC()
+result_joinB = table_joinB()
 
 #Function 17. (3) JOIN customer table with payment table.
 
-def table_join():
+def table_joinC():
    with sqlite3.connect ("sakila.db") as conn:
     cursor = conn.cursor()
     sql = f"""SELECT *
@@ -417,7 +417,7 @@ def table_join():
     data = cursor.fetchall()
     return(data)
    
-result_joinC = table_join()
+result_joinC = table_joinC()
 
 
 
