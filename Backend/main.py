@@ -144,7 +144,7 @@ def get_all_languages():
 
 def password_hash(password):
     encrypt = hashlib.sha256(password.encode()).hexdigest()
-    return json.dumps (encrypt)
+    return ("Encrypted Password:",json.dumps (encrypt))
     
     
    
