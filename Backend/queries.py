@@ -1,364 +1,445 @@
-import email
 import sqlite3
-import datetime
+import json
 
 
 
-#20 Python Functions. (Activate print(function) to get result.)
+
+#20 Queries. (Activate print(function) to get result.)
 
 # Function 1. SELECT all cities
 
 def select_all_cities():
     with sqlite3.connect ("sakila.db") as conn:
         cursor = conn.cursor()
-        cities = f"SELECT city FROM city"
+
+        cities = f"""SELECT city 
+                     FROM city"""
+
         cursor.execute(cities)
         data = cursor.fetchall()
-        return data
+        return ("Query successful!",data)
     
-for cityresult in select_all_cities():
-    cityprint = cityresult [0]
-    #print (cityprint)
-
 
  
 # Function 2. ORDER actors BY first names
 
-def order_by_one():
+def order_actors_first_name():
     with sqlite3.connect ("sakila.db") as conn:
         cursor = conn.cursor()
-        fname = 'first_name'
-        lstname = 'last_name'
-        actors = f"SELECT {fname},{lstname} FROM actor ORDER BY first_name"  
+
+        actors = f"""SELECT first_name, 
+                     last_name 
+                     FROM actor 
+                     ORDER BY first_name"""
+
         cursor.execute (actors)
         data = cursor.fetchall()
-        return data
+    return ("Query successful!",data)
 
-for actorresult in order_by_one():
-    actorfirstname = actorresult[0]
-    actorlastname = actorresult[1]
-    #print (actorfirstname,actorlastname)
-        
 
+    
  
 # Function 3. Order actors by last names.
 
-def order_by_two():
+def order_actors_last_name():
     with sqlite3.connect ("sakila.db") as conn:
         cursor = conn.cursor()
-        fname = 'first_name'
-        lname = 'last_name'
-        actors = f"SELECT {fname}, {lname} FROM actor ORDER BY last_name"
+
+        actors = f"""SELECT first_name, 
+                     last_name 
+                     FROM actor 
+                     ORDER BY last_name"""
+
         cursor.execute(actors)
         data = cursor.fetchall()
-    return data
+    return ("Query successful!",data)
 
-for actororder in order_by_two():
-    actorfname = actororder[0]
-    actorlstname= actororder[1]
-    #print (actorfname,actorlstname)
-    
+
 
 
 
 # Function 4. ORDER films by release year.
 
-def select_films(ord):
+def select_films():
     with sqlite3.connect ("sakila.db") as conn:
         cursor = conn.cursor()
-        #ord = 'release_year'
-        #movie = 'title'
-        film = f"SELECT * FROM film ORDER BY {ord} LIMIT 5" 
+
+        film = f"""SELECT * 
+                   FROM film 
+                   ORDER BY release_year 
+                   LIMIT 5""" 
+
         cursor.execute(film)
         data = cursor.fetchall()
-    return data
-
-
-
-#result = select_films("release_year")
+    return("Query successful!",data)
 
 
 
 
 # Function 5. SELECT film titles WHERE the rating is R. LIMIT to first 5 records.
 
-def select_film_by_rating(rate):
+def select_films_by_rating(rate):
     with sqlite3.connect ("sakila.db") as conn:
         cursor = conn.cursor()
-       # rate = 'R'
-       # ttl = 'title'
-        film = f"SELECT * FROM film WHERE rating = '{rate}' LIMIT 5;"
-        print (film)
+
+        film = f"""SELECT title, 
+                   rating 
+                   FROM film 
+                   WHERE rating = '{rate.upper()}' 
+                   LIMIT 100;"""
+
         cursor.execute(film)
         data = cursor.fetchall()
+    return ("Query successful!",data)
+
+
+# Function 6. SELECT customers using WHERE their surname begins with selected letter. LIMIT results to 100 records.
+
+def select_customers_by_last_name(letter):
+    with sqlite3.connect ("sakila.db") as conn:
+        cursor = conn.cursor()
+
+        film = f"""SELECT first_name, 
+                   last_name, 
+                   email 
+                   FROM customer 
+                   WHERE last_name 
+                   LIKE '{letter.upper()}%'
+                   ORDER by last_name 
+                   LIMIT 100;
+                   """ 
+
+        cursor.execute (film)
+
+        data = ("Query successful!",cursor.fetchall())
     return data
 
-films = select_film_by_rating("R")
 
 
+# Function 7. SELECT movie titles with up to the selected running using WHERE. LIMIT results to first 100 records.
 
-  
-    
-
-# Function 6. SELECT customers using WHERE their surname begins with 'S'. LIMIT results to first 3 records.
-
-def select_three():
+def select_movies_by_running_time(max_length_in_minutes,limit_to):
     with sqlite3.connect ("sakila.db") as conn:
         cursor = conn.cursor()
-        letter = 'S'
-        fname = 'first_name'
-        lstname = 'last_name'
-        film = f"SELECT {fname}, {lstname} FROM customer WHERE last_name LIKE '{letter}%';"
+
+        film = f"""SELECT title, 
+                   rating, 
+                   length 
+                   FROM film 
+                   WHERE length <= {max_length_in_minutes} 
+                   ORDER BY title 
+                   LIMIT {limit_to};
+                   """
+
         cursor.execute (film)
-        data = cursor.fetchall()
-    return(data)
 
-for select_three_tidy in select_three():    
-        fname = select_three_tidy [0]
-        lname = select_three_tidy [1]
-        #print (select_three_tidy)
+        data = ("Query successful!",cursor.fetchall())
+    return data
 
 
 
+# Function 8. (1) INSERT INTO customer table new customer.
 
-# Function 7. SELECT movie titles with a running time of less than two hours using WHERE. LIMIT results to first 10 records.
-
-def select_ten():
-    with sqlite3.connect ("sakila.db") as conn:
-        cursor = conn.cursor()
-        twohr = 120
-        film = f"SELECT title FROM film WHERE length <{twohr} LIMIT(10);"
-        cursor.execute (film)
-        data = cursor.fetchall()
-    return(data)
-
-
-for select_ten_tidy in select_ten():
-    seltentidy = select_ten_tidy[0]
-    #print (seltentidy)
-
-# Function 8. (1) INSERT INTO customer table new customer, Ivana Movie for Store 2. Display new record.
-
-# import sqlite3
-
-def insert_user(active,address,district,cityid,postcode,fstname,lstname,email,store_id):
+def insert_new_customer_record(first_name,last_name,email,address,district,city_id,postal_code,phone_number,store_id):
+   
     with sqlite3.connect("sakila.db") as conn:
+        
         cursor = conn.cursor()
-        #active = 1
-        #address = '5 Overdues Mews'
-        #district = 'Grand Views'
-        #cityid = 501
-        #postcode = 1234
-        #phone = 6494783767
-        #fstnme = 'IVANA'
-        #lstnme = 'MOVIE'
-        #email = 'ivanamail@gmail.com'
-        #store_id = 2
 
-        new_address = f"INSERT INTO address (address,district, city_id, postal_code, phone,last_update) VALUES ('{address}', '{district}', {cityid}, {postcode},{ph},datetime('now'));" 
+        new_address = f"""INSERT 
+                          INTO address 
+                          (address,
+                          district,
+                          city_id,
+                          postal_code,
+                          phone,
+                          last_update) 
+                          VALUES 
+                         ('{address.upper()}',
+                         '{district.upper()}',
+                          {city_id},
+                          {postal_code},
+                          {phone_number},
+                          datetime('now'));""" 
+
         cursor.execute (new_address)
-        add_id_query = f"SELECT address_id FROM address WHERE phone = {ph};"
-        cursor.execute(add_id_query)
-        data = cursor.fetchall()
-        address_id = data[0]
-        customerADD = f"INSERT INTO customer (store_id,first_name,last_name,email,address_id,active,create_date,last_update) VALUES ({store_id},'{fstnme}','{lstnme}','{email}','{address_id}',{active},datetime('now'),datetime('now'))"
-        cursor.execute (new_address)
+        address_id = cursor.lastrowid
+
+        customerADD = f"""INSERT 
+                          INTO customer 
+                          (store_id,
+                          first_name,
+                          last_name,
+                          email,
+                          address_id,
+                          active,
+                          create_date,
+                          last_update) 
+                          VALUES 
+                          ({store_id},
+                          '{first_name.upper()}',
+                          '{last_name.upper()}',
+                          '{email.lower()}',
+                          {address_id},{1},
+                          datetime('now'),
+                          datetime('now'))"""
+
         cursor.execute (customerADD)
-        #printrec= f"SELECT customer_id,first_name,last_name,email FROM customer WHERE customer_id=600;"
-        #cursor.execute (printrec)
-        #data = cursor.fetchall()
-    return (data)
 
-#for printnewrec in insert_user(1):
-    id = printnewrec[0]
-    name = printnewrec[1]
-    surname = printnewrec[2]
-    email = printnewrec[3]
-    id = printnewrec[0]
-    print (id,name,surname,email)
+        customer_id = cursor.lastrowid
+        cursor.execute (f"SELECT * FROM customer WHERE customer_id= {customer_id}") 
+        data = cursor.fetchall()
+        return ("Insert successful!",data)
 
 
-# Function 9. DELETE Ivana Movie FROM customer records. List all remaining records.
 
-# def delete_ivana():
-#     with sqlite3.connect ("sakila.db") as conn:
-#         cursor = conn.cursor()
-#         customer_id = 600
-#         fstnme = 'IVANA'
-#         lstnme ='MOVIE'
-#         phone = 54639062007
-#         address_id = 606
-#         addressDel = f"DELETE FROM address where address_id = {address_id};"
-#         customerDel = f"DELETE FROM customer WHERE customer_id = {customer_id} AND first_name ='{fstnme}' AND last_name ='{lstnme}';"
-#         customeraddDel = f"DELETE FROM address WHERE phone = 54639062007;"
-#         cursor.execute (addressDel)
-#         cursor.execute (customerDel)
-#         data = cursor.fetchall()
-#     return(data)
+
+
+ # Function 9. DELETE a customer from customer records. 
+
+def delete_customer(customer_id,first_name,last_name,email):
+    with sqlite3.connect ("sakila.db") as conn:
+
+        cursor = conn.cursor()
+
+        addressid = f"SELECT address_id FROM customer WHERE customer_id = {customer_id};"
+
+        cursor.execute (addressid)
+        address_id = cursor.fetchone()[0]
+
+        deleteadd =  f"DELETE FROM address WHERE address_id = {address_id};"
+
+        cursor.execute (deleteadd)
+
+        customerDel = f"""DELETE 
+                          FROM customer 
+                          WHERE customer_id = {customer_id} 
+                          ANDfirst_name ='{first_name.upper()}' 
+                          AND last_name ='{last_name.upper()}' 
+                          AND email = '{email.lower()}';"""
+
+        cursor.execute (customerDel)
+
+        data = cursor.fetchall()
+        return("Delete successful!",data)
     
-# def list_cust():
-#     with sqlite3.connect ("sakila.db") as conn:
-#         cursor = conn.cursor()
-#         cursor.execute ("SELECT first_name, last_name FROM customer;")
-#         data = cursor.fetchall()
-#     return(data)
 
-# print (delete_ivana())
+ 
 
-# print(list_cust())
+# Function 10. UPDATE country record
+
+def update_country_record(country_id,current_country_name,new_country_name):
+    with sqlite3.connect ("sakila.db") as conn:
+         cursor = conn.cursor()
+
+         country_update =  f"""UPDATE country 
+                               SET country = '{new_country_name}'
+                               WHERE country_id = {country_id}
+                               AND country = '{current_country_name}';
+                               """
+
+         display_new = f"""SELECT * 
+                           FROM country 
+                           WHERE country_id = {country_id};
+                           """
+         cursor.execute (country_update)
+         conn.commit()
+         cursor.execute (display_new)
+         conn.commit()
+         return('Success!',country_id,new_country_name, 'Record updated!')
+         
  
 
 
+#Function 11. (2) INSERT a new actor record INTO the actor table. 
 
-# Function 10. Uma Wood has married Ed Chase, taking his last name and combining it with hers. UPDATE her record to reflect this. 
-
-def update_record():
+def insert_new_actor(first_name,last_name):
     with sqlite3.connect ("sakila.db") as conn:
         cursor = conn.cursor()
-        fname = 'UMA'
-        newlname = 'CHASE-WOOD'
-        actorid= 13
-        actor_update =  f"UPDATE actor SET first_name ='{fname}', last_name ='{newlname}' WHERE actor_id = {actorid};"
-        cursor.execute (actor_update)
-        actor_new = f"SELECT * FROM actor WHERE actor_id = {actorid};"
-        cursor.execute (actor_new)
-        data = cursor.fetchall()
-        return(data)
 
-for updaterec in update_record(): 
-    actid = updaterec[0]
-    nmeone = updaterec [1] 
-    nmetwo = updaterec [2]
-    #print (actid,nmeone,nmetwo) 
+        actor_new = f"""INSERT 
+                        INTO actor 
+                        (first_name,
+                        last_name,
+                        last_update) 
+                        VALUES
+                        ('{first_name.upper()}',
+                        '{last_name.upper()}',
+                        datetime('now'));
+                        """
+
+        cursor.fetchall()
+        cursor.execute(actor_new)
+        conn.commit()
+        return('Success!',first_name,last_name, "New actor inserted!")
+       
+        
+
+        
+#Function 12. (3) INSERT a new film title INTO the films table.
+
+ 
+def insert_new_film(*params):
+    
+    language = params[0]
+    title = params[1].upper()
+    description=params[2]
+    release_year= params[3]
+    rental_duration = params[4]
+    rental_rate = params[5]
+    runtime= params [6]
+    replace_fee = params [7]
+    rating = params [8].upper()
+    special_features = params [9]
+
+    with sqlite3.connect ("sakila.db") as conn:
+        cursor = conn.cursor()
+
+        query = f"""SELECT language_id 
+                    FROM language 
+                    WHERE name = '{language}';
+                    """
+
+        cursor.execute (query)
+        language_id = cursor.fetchone()[0]
+        print (language_id)
+         
+        film_new =  f"""INSERT 
+                        INTO film (
+                        title,
+                        description,
+                        release_year,
+                        language_id,
+                        rental_duration,
+                        rental_rate,
+                        length,                 
+                        replacement_cost,
+                        rating,
+                        special_features,
+                        last_update
+                        )  
+                        VALUES (
+                       '{title}',
+                       '{description}',
+                        {release_year},
+                        {language_id},
+                        {rental_duration},
+                        {rental_rate},
+                        {runtime},
+                        {replace_fee},
+                       '{rating}',
+                       '{special_features}',
+                        datetime('now')
+                        );
+                        """
+        cursor.execute(film_new)
+        conn.commit()
+        film_id = cursor.lastrowid
+        print(film_id)
+
+        query = f"""SELECT * 
+                    FROM film 
+                    WHERE film_id = {film_id};
+                    """
+        
+        cursor.execute (query)
+        cursor.fetchall()
+        dict= {
+            'language':language,
+            'title':title,
+            'description': description,
+            'release_year': release_year,
+            'language_id': language_id,
+            'rental_duration': rental_duration,
+            'rental_rate': rental_rate,
+            'length': runtime,
+            'replacement_cost': replace_fee,
+            'rating': rating,
+            'special_features': special_features,
+            'last_update': 'datetime(now)'
+        }
+        json_object =json.dumps(dict, indent = 2,)
+        return(json_object,'Success!',title,release_year,runtime,rating, 'New film added!')
+        
+        
     
 
-#Function 11. (2) INSERT a new record for the actor Dirk Diggler INTO the actor table. 
 
-def insert_new_actor():
+# Function 13. (4) INSERT a record for a new language INTO the language table.
+
+
+def insert_new_language(language_name):
+    
     with sqlite3.connect ("sakila.db") as conn:
-        cursor = conn.cursor()
-        ftname = 'Dirk'
-        ltname = 'Diggler'
-        actor_new =  f"INSERT INTO actor (first_name,last_name,last_update) VALUES ('{ftname}','{ltname}',datetime('now'))"
-        cursor.execute (actor_new)
-        actor_newrec =  ("SELECT * FROM actor WHERE last_name = 'Diggler';")
-        cursor.execute (actor_newrec)
-        data = cursor.fetchall()
-    return(data)
-for actinst in insert_new_actor():
-    ident = actinst [0]
-    firnm = actinst [1]
-    latnm = actinst [2]
-    #print (ident,firnm,latnm)
+         cursor = conn.cursor()
+
+         query= f"""INSERT INTO 
+                    language (name,last_update)
+                    VALUES ('{language_name}',
+                    datetime('now'));
+                    """
+               
+         cursor.fetchall()
+         cursor.execute(query)
+         conn.commit()
+         #return('Success!',language_name, "New language inserted!")
+
+         queryB= f"SELECT * FROM language WHERE name= '{language_name}';"
+         cursor.execute (queryB)
+         cursor.fetchall()
+
+         dict= {
+            'name':language_name,
+            'last_update': 'datetime(now)'
+        }
+         json_object =json.dumps(dict, indent = 2,)
+         return(json_object,'Success!',language_name, 'New language added!')
 
 
-# Function 12. (3) INSERT a new film title, "The Adventures of Buckaroo Banzai Across the 8th Dimension" INTO the films table.
+
+         
 
 
-def insert_new_film():
+# Function 14. (5) INSERT a new country INTO country table.
+
+
+def insert_new_country(country_name):
     with sqlite3.connect ("sakila.db") as conn:
-        cursor = conn.cursor()
-        ttle = 'The Adventures of Buckaroo Banzai Across the 8th Dimension'
-        desc = 'Best movie you never saw.'
-        year = '1984'
-        langid = 1
-        origlangid = None
-        rentdur = 6
-        rentpri = 6.99
-        runti = 103
-        replace = 30.99
-        rting = 'PG'
-        spec = 'Trailers, Deleted Scenes'
-        film_new = f"INSERT INTO film (title,description,release_year,language_id,original_language_id,rental_duration,rental_rate,length,replacement_cost,rating,special_features,last_update)  VALUES ('{ttle}','{desc}',{year},{langid},'{origlangid}',{rentdur},{rentpri},{runti},{replace},'{rting}','{spec}',datetime('now'))"
-        cursor.execute (film_new)
-        film_newrec =  f"SELECT * FROM film WHERE title = '{ttle}';"
-        cursor.execute (film_newrec)
-        data = cursor.fetchall()
-    return(data)
+         cursor = conn.cursor()
+       
+         new_country = f"""INSERT INTO 
+                           country (country, last_update) 
+                           VALUES ('{country_name.title()}', 
+                           datetime('now'));
+                           """
+         
+         cursor.fetchall()
+         cursor.execute (new_country)
+         conn.commit()
 
-for newflm in insert_new_film():
-    filmidn = newflm [0]
-    tite = newflm [1]
-    dec = newflm [2]
-    yr = newflm [3]
-    rtg= newflm [10]
-    rcst = newflm[7]
+         query = f"""SELECT * 
+                     FROM country 
+                     WHERE country ='{country_name}';
+                     """
 
-    #print(filmidn,tite,dec,yr,rtg,rcst)
-
-
-
-
-# Function 13. (4) INSERT a record for new staff member, "Jim Smalllberries" INTO the staff table.
-
-
-def insert_new_staff():
-    with sqlite3.connect ("sakila.db") as conn:
-        cursor = conn.cursor()
-        manager = 3
-        add = 3
-        fname = 'Jim'
-        lname = 'Smallberries'
-        address = 4
-        email = 'jim.smallberries@sakila.com'
-        usernme = 'Jimbo'
-        active = 'TRUE'
-        psswd = '1d192f70073521289c85368373daf45b6f13f320d620073a58d62b696f599000'
-        store_new_id = f"INSERT INTO store (manager_staff_id,address_id,last_update) VALUES ({manager},{add},datetime('now'))"
-        cursor.execute (store_new_id)
+         cursor.fetchall()
+         cursor.execute (query)
+         conn.commit()
         
-        storeID = f"SELECT store_id, manager_staff_id FROM store WHERE store_id = 3"
-        cursor.execute (storeID)
-        data= cursor.fetchall()[0]
-        store_id = data[0]
-        staff_new =  f"INSERT INTO staff (first_name,last_name,address_id,email,store_id,active,username,password,last_update)  VALUES ('{fname}','{lname}',{address},'{email}','{store_id}',{active},'{usernme}','{psswd}',datetime('now'))"
-        cursor.execute (staff_new)
-        
-        staff_newrec =  f"SELECT * FROM staff WHERE last_name = '{lname}';"
-        cursor.execute(staff_newrec)
-        data = cursor.fetchall()
-    return(data)
+         dict= {
+            'country':country_name.title(),
+            'last_update': 'datetime(now)'
+        }
+         json_object =json.dumps(dict, indent = 2,)
+         return(json_object,'Success!',country_name.title(), 'New language added!')
 
-
-for newbie in insert_new_staff():
-    id = newbie [0]
-    firnam = newbie [1]
-    lasnam =newbie[2]
-    eml = newbie[5]
-    usname = newbie[8]
-    #print('ID:',id,'Name:',firnam,lasnam,'Email:',eml,'Username:',usname)
-
-# Function 14. (5) INSERT a new country INTO country table, "Wakanda"
-
-
-def insert_new_country(cntry):
-    with sqlite3.connect ("sakila.db") as conn:
-        cursor = conn.cursor()
-        #cntry = 'Wakanda'
-        country_new = f"INSERT INTO country (country, last_update)  VALUES ('{cntry}', datetime('now'));"
-        print (country_new)
-        cursor.execute (country_new)
-        result = cursor.lastrowid
-        return result
-
-#cnt = insert_new_country("Wakanda")
-
-
-# for newflm in insert_new_film():
-#     filmidn = newflm [0]
-#     tite = newflm [1]
-#     dec = newflm [2]
-#     yr = newflm [3]
-#     rtg= newflm [10]
-#     rcst = newflm[7]
-
-#     #print(filmidn,tite,dec,yr,rtg,rcst)
 
 #Function 15. (1) JOIN the film_actor table with the film table and film_id table.
 
 def table_joinA():
    with sqlite3.connect ("sakila.db") as conn:
     cursor = conn.cursor()
+
     sql = f"""SELECT title, film.film_id, *  
                FROM film 
                JOIN film_actor ON film.film_id = film_actor.film_id
@@ -369,15 +450,17 @@ def table_joinA():
     cursor.execute (sql)
    
     data = cursor.fetchall()
-    return(data)
+    return data
 
-result_joinA = table_joinA()
+#result_joinA = table_joinA()
+#print(result_joinA)
 
 #Function 16. (2) JOIN film_category table with the film table and category table.
 
 def table_joinB():
    with sqlite3.connect ("sakila.db") as conn:
     cursor = conn.cursor()
+
     sql = f"""SELECT *  
                FROM film  
                JOIN film_category ON film_category.film_id = film.film_id
@@ -387,82 +470,87 @@ def table_joinB():
 
     print (sql)
     cursor.execute (sql)
-  
-    
     data = cursor.fetchall()
     return(data)
    
-    
-
-result_joinB = table_joinB()
+#result_joinB = table_joinB()
+#print(result_joinB)
 
 #Function 17. (3) JOIN customer table with payment table.
 
 def table_joinC():
    with sqlite3.connect ("sakila.db") as conn:
     cursor = conn.cursor()
+
     sql = f"""SELECT *
               FROM customer
               JOIN payment ON payment.customer_id = customer.customer_id 
               LIMIT 300 
                """
 
-    print (sql)
     cursor.execute (sql)
-  
     data = cursor.fetchall()
     return(data)
    
-result_joinC = table_joinC()
+#result_joinC = table_joinC()
+#print(result_joinC)
 
 
 
-#Function 18. SELECT all from payment table.
-def select_all_payments():
+#Function 18. SELECT from payment table
+
+def select_payments(customer_id,limit_to):
    with sqlite3.connect ("sakila.db") as conn:
     cursor = conn.cursor()
-    selectp = f"SELECT * FROM payment"
-    print (selectp)
-    cursor.execute (selectp)
 
+    query = f"""SELECT * 
+                FROM payment 
+                WHERE
+                customer_id = {customer_id} 
+                LIMIT {limit_to};
+                """
+
+    cursor.execute (query)
     data = cursor.fetchall()
-    return(data)
-
-result_selectp = select_all_payments()
+    return("Query successful!",data)
 
 
 
-#Function 19  SELECT all film categories
 
-def select_all_cats():
+#Function 19.  SELECT all film categories
+
+def select_all_film_categories():
    with sqlite3.connect ("sakila.db") as conn:
     cursor = conn.cursor()
-    selectc = f"SELECT name FROM category"
+
+    query = f"""SELECT name 
+                FROM category;
+                """
     
-    cursor.execute (selectc)
-   
+    cursor.execute (query)
     data = cursor.fetchall()
-    print (selectc)
-    return(data)
-
-result_selectc = select_all_cats()
+    return("Query successful!",data)
 
 
 
-#FUNCTION 20. SELECT all languages
 
-def select_all_lang():
+
+#Function 20. SELECT all languages
+
+def select_all_languages():
    with sqlite3.connect ("sakila.db") as conn:
     cursor = conn.cursor()
-    selectl = f"SELECT name FROM language"
+
+    selectl = f"""SELECT name 
+                  FROM language"""
     
     cursor.execute (selectl)
    
     data = cursor.fetchall()
     print (selectl)
-    return(data)
+    return("Query successful!",data)
 
-result_selectl = select_all_lang()
+
 
 
 
