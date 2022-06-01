@@ -138,9 +138,9 @@ def get_all_languages():
 
 
 
-#put Password Hash Routine
+#post Password Hash Routine
 
-@app.put('/create Password Hash')
+@app.post('/create Password Hash')
 
 def password_hash(password):
     encrypt = hashlib.sha256(password.encode()).hexdigest()

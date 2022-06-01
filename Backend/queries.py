@@ -17,7 +17,7 @@ def select_all_cities():
 
         cursor.execute(cities)
         data = cursor.fetchall()
-        return ("Query successful!",data)
+        return ("QUERY SUCCESSFUL!",data)
     
 
  
@@ -34,7 +34,7 @@ def order_actors_first_name():
 
         cursor.execute (actors)
         data = cursor.fetchall()
-    return ("Query successful!",data)
+    return ("QUERY SUCCESSFUL!",data)
 
 
     
@@ -52,7 +52,7 @@ def order_actors_last_name():
 
         cursor.execute(actors)
         data = cursor.fetchall()
-    return ("Query successful!",data)
+    return ("QUERY SUCCESSFUL!",data)
 
 
 
@@ -71,7 +71,7 @@ def select_films():
 
         cursor.execute(film)
         data = cursor.fetchall()
-    return("Query successful!",data)
+    return("QUERY SUCESSFUL!",data)
 
 
 
@@ -90,7 +90,7 @@ def select_films_by_rating(rate):
 
         cursor.execute(film)
         data = cursor.fetchall()
-    return ("Query successful!",data)
+    return ("QUERY SUCCESSFUL!",data)
 
 
 # Function 6. SELECT customers using WHERE their surname begins with selected letter. LIMIT results to 100 records.
@@ -111,7 +111,7 @@ def select_customers_by_last_name(letter):
 
         cursor.execute (film)
 
-        data = ("Query successful!",cursor.fetchall())
+        data = ("QUERY SUCCESSFUL!",cursor.fetchall())
     return data
 
 
@@ -133,7 +133,7 @@ def select_movies_by_running_time(max_length_in_minutes,limit_to):
 
         cursor.execute (film)
 
-        data = ("Query successful!",cursor.fetchall())
+        data = ("QUERY SUCCESSFUL!",cursor.fetchall())
     return data
 
 
@@ -186,10 +186,10 @@ def insert_new_customer_record(first_name,last_name,email,address,district,city_
 
         cursor.execute (customerADD)
 
-        customer_id = cursor.lastrowid
-        cursor.execute (f"SELECT * FROM customer WHERE customer_id= {customer_id}") 
+        #customer_id = cursor.lastrowid
+        cursor.execute (f"SELECT * FROM customer;") 
         data = cursor.fetchall()
-        return ("Insert successful!",data)
+        return ("NEW CUSTOMER INSERT SUCCESSFUL!",data)
 
 
 
@@ -214,14 +214,15 @@ def delete_customer(customer_id,first_name,last_name,email):
         customerDel = f"""DELETE 
                           FROM customer 
                           WHERE customer_id = {customer_id} 
-                          ANDfirst_name ='{first_name.upper()}' 
+                          AND first_name ='{first_name.upper()}' 
                           AND last_name ='{last_name.upper()}' 
                           AND email = '{email.lower()}';"""
 
         cursor.execute (customerDel)
-
+        cursor.execute (f"SELECT * FROM customer") 
+        #WHERE customer_id= {customer_id}
         data = cursor.fetchall()
-        return("Delete successful!",data)
+        return("DELETED! GREAT SUCCESS!",data)
     
 
  
@@ -238,17 +239,20 @@ def update_country_record(country_id,current_country_name,new_country_name):
                                AND country = '{current_country_name}';
                                """
 
-         display_new = f"""SELECT * 
-                           FROM country 
-                           WHERE country_id = {country_id};
-                           """
-         cursor.execute (country_update)
-         conn.commit()
-         cursor.execute (display_new)
-         conn.commit()
-         return('Success!',country_id,new_country_name, 'Record updated!')
          
- 
+         cursor.execute (country_update)
+         cursor.execute (f"""SELECT * 
+                           FROM country 
+                           ;
+                           """)
+         conn.commit()
+         data = cursor.fetchall()
+         
+         
+         
+         return('COUNTRY RECORD UPDATED! VERY NICE!',data)
+
+        
 
 
 #Function 11. (2) INSERT a new actor record INTO the actor table. 
@@ -267,12 +271,15 @@ def insert_new_actor(first_name,last_name):
                         '{last_name.upper()}',
                         datetime('now'));
                         """
-
-        cursor.fetchall()
-        cursor.execute(actor_new)
-        conn.commit()
-        return('Success!',first_name,last_name, "New actor inserted!")
-       
+        
+        cursor.execute (actor_new)
+        cursor.execute (f"""SELECT * 
+                           FROM actor 
+                           ;
+                           """) 
+        data = cursor.fetchall()
+        return("NEW ACTOR INSERT SUCCESSFUL! SO GROOVY!",data)
+  
         
 
         
@@ -333,33 +340,18 @@ def insert_new_film(*params):
                         );
                         """
         cursor.execute(film_new)
+        cursor.execute (f"""SELECT * 
+                            FROM film;
+                            """)
         conn.commit()
-        film_id = cursor.lastrowid
-        print(film_id)
-
-        query = f"""SELECT * 
-                    FROM film 
-                    WHERE film_id = {film_id};
-                    """
         
-        cursor.execute (query)
-        cursor.fetchall()
-        dict= {
-            'language':language,
-            'title':title,
-            'description': description,
-            'release_year': release_year,
-            'language_id': language_id,
-            'rental_duration': rental_duration,
-            'rental_rate': rental_rate,
-            'length': runtime,
-            'replacement_cost': replace_fee,
-            'rating': rating,
-            'special_features': special_features,
-            'last_update': 'datetime(now)'
-        }
-        json_object =json.dumps(dict, indent = 2,)
-        return(json_object,'Success!',title,release_year,runtime,rating, 'New film added!')
+        
+        data = cursor.fetchall()
+        # return("NEW FILM INSERT SUCCESSFUL!",data)
+
+       
+        json_object =json.dumps(data)
+        return('NEW FILM INSERT SUCCESSFUL!',json_object)
         
         
     
@@ -373,27 +365,25 @@ def insert_new_language(language_name):
     with sqlite3.connect ("sakila.db") as conn:
          cursor = conn.cursor()
 
-         query= f"""INSERT INTO 
+         new_lang= f"""INSERT INTO 
                     language (name,last_update)
                     VALUES ('{language_name}',
                     datetime('now'));
                     """
                
-         cursor.fetchall()
-         cursor.execute(query)
+         
+         cursor.execute(new_lang)
+         cursor.execute (f"SELECT * FROM language;")
          conn.commit()
-         #return('Success!',language_name, "New language inserted!")
+         
+         data= cursor.fetchall()
 
-         queryB= f"SELECT * FROM language WHERE name= '{language_name}';"
-         cursor.execute (queryB)
-         cursor.fetchall()
-
-         dict= {
-            'name':language_name,
-            'last_update': 'datetime(now)'
-        }
-         json_object =json.dumps(dict, indent = 2,)
-         return(json_object,'Success!',language_name, 'New language added!')
+        #  dict= {
+        #     'name':language_name,
+        #     'last_update': datetime('now')
+        # }
+         json_object =json.dumps(data)
+         return('SUCCESS!',language_name.upper(),'LANGUAGE ADDED!',json_object)
 
 
 
@@ -431,7 +421,7 @@ def insert_new_country(country_name):
             'last_update': 'datetime(now)'
         }
          json_object =json.dumps(dict, indent = 2,)
-         return(json_object,'Success!',country_name.title(), 'New language added!')
+         return(json_object,'Success!',country_name.title(), 'New country added!')
 
 
 #Function 15. (1) JOIN the film_actor table with the film table and film_id table.
