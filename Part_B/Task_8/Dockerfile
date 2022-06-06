@@ -31,12 +31,12 @@ VOLUME /database_volume
 
 #f. Use ENTRYPOINT to run a default command
 
-ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port"]
+ENTRYPOINT ["uvicorn", "main:app"] 
 
 #g. Use CMD to run another default command.  A CMD command can be overridden, whereas an ENTRYPOINT command cannot. 
 #   The port number can therefore be overidden when a user executes the "docker run" command + a parameter.
 
-CMD ["64308"] 
+CMD ["--host", "0.0.0.0", "--port", "64308"]
 
 #h. Use EXPOSE to document the port the container exposes
 
@@ -47,7 +47,7 @@ EXPOSE 80
 
 
 
-#k.  How to run the resulting Docker image. Use: docker run: -p 8000:80 --detach --sakila sakila_app_1.0
+#k.  How to run the resulting Docker image. Use: docker run -i sakila_app_1.0
 
 
 
