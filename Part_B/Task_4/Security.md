@@ -10,9 +10,9 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaQHn/N7zgkWqDroONBRb0w28yEWgud8JYlHygJs6g
 
 uvicorn main:app --port 64308 --host
 (Refer to screenshot Image A)
-To achieve this, first, a simple main.py file was created in the command line.  This command changes the port of the API it is to be deployed into, in this case, 64308.
+To achieve this, first, a simple main.py file was created in the command line.  This command changes the port of the API it is to be deployed into, in this case, 64308.  (*SEE IMAGE IN TASK 4 SCREENSHOTS FOLDER)
 
-###C:  Name of the file and the line needed to change in order to change the SSH
+###C:  Name of the file and the line needed to change in order to change the SSH Server Port Number
 
 File:  sshd_config
 Path /etc/ssh/sshd_config

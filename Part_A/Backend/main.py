@@ -16,7 +16,7 @@ app = FastAPI()
 
 @app.get('/get Cities')
 def get_all_cities():
-   # print(f"{QuerySig}")
+   # print(f"{querySuc}")
     result = queries.select_all_cities()
     return json.dumps (result)
     
