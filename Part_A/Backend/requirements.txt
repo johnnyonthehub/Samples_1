@@ -1,2 +1,5 @@
+pip freeze -r
+
 fastapi
 uvicorn
+sqlite3
