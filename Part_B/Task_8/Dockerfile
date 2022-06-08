@@ -32,6 +32,7 @@ ENV Confirmation="Query Successful"
 #i. Use VOLUME to allow the container to save data
 
 VOLUME \Users\user\Documents\sakila_data
+ 
 
 #f. Use ENTRYPOINT to run a default command
 
@@ -44,14 +45,14 @@ CMD ["--host", "0.0.0.0", "--port", "3000"]
 
 #h. Use EXPOSE to document the port the container exposes
 
-EXPOSE 80
+EXPOSE 64308
 
 
 #j.  How to to build the Dockerfile. In the command line. cd to working directory. Build with: docker build -t jdock007/sakila_app_1.0 .
 
 
 
-#k.  How to run the resulting Docker image. Use: docker run -dp 80:3000  jdock007/sakila_app_1.0
+#k.  How to run the resulting Docker image. Use: docker run -dp 64308:3000  jdock007/sakila_app_1.0
 
 
 
