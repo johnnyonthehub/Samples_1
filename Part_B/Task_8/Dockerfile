@@ -1,10 +1,8 @@
 #a. Start FROM a base image.  Version of Python to be used can be passed in as a parameter at build time.
 
-#ARG version= 3.8
+
 FROM python:3.8
 
-
-#FROM python:${version}
 
 #c. Change to app directory
 
@@ -13,10 +11,6 @@ WORKDIR  /app
 #d. COPY files into the above directory
 
 COPY . .
-
-
-
-
 
 #b. Update package manager and install required packages
 
@@ -31,7 +25,9 @@ ENV Confirmation="Query Successful"
 
 #i. Use VOLUME to allow the container to save data
 
-VOLUME \Users\user\Documents\sakila_data
+VOLUME /sakila_data
+
+#VOLUME \Users\user\Documents\sakila_data
  
 
 #f. Use ENTRYPOINT to run a default command
